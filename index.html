@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Drive Files</title>
+    <script>
+        function listDriveFiles() {
+            var folderId = '1VRiPoqsD1VfwgRvSnVX6877nivXymnP-';  // Replace with your folder's ID
+            var apiKey = 'AIzaSyC8izp3_5NSN6yXQdTsCKpzrJjWF5ZV8IU';  // Replace with your API Key
+            var url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents&key=${apiKey}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    var files = data.files;
+                    var filesDiv = document.getElementById("files");
+                    files.forEach(file => {
+                        // Check the mimeType of the file and display it accordingly
+                        if (file.mimeType.startsWith('image/')) {
+                            // Display image
+                            var img = document.createElement("img");
+                            img.src = `https://drive.google.com/uc?export=view&id=${file.id}`;
+                            img.style.width = "200px";
+                            img.style.margin = "10px";
+                            filesDiv.appendChild(img);
+                        } else if (file.mimeType.startsWith('video/')) {
+                            // Display video
+                            var video = document.createElement("video");
+                            video.src = `https://drive.google.com/uc?export=view&id=${file.id}`;
+                            video.controls = true;
+                            video.style.width = "300px";
+                            video.style.margin = "10px";
+                            filesDiv.appendChild(video);
+                        } else if (file.mimeType === 'application/pdf') {
+                            // Display PDF as a link
+                            var link = document.createElement("a");
+                            link.href = `https://drive.google.com/file/d/${file.id}/view`;
+                            link.target = "_blank";
+                            link.textContent = "View PDF: " + file.name;
+                            link.style.display = "block";
+                            link.style.margin = "10px";
+                            filesDiv.appendChild(link);
+                        } else {
+                            // Display as a generic link for other file types
+                            var link = document.createElement("a");
+                            link.href = `https://drive.google.com/file/d/${file.id}/view`;
+                            link.target = "_blank";
+                            link.textContent = "Download File: " + file.name;
+                            link.style.display = "block";
+                            link.style.margin = "10px";
+                            filesDiv.appendChild(link);
+                        }
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        document.addEventListener("DOMContentLoaded", listDriveFiles);
+    </script>
+</head>
+<body>
+    <h1>Google Drive Files</h1>
+    <div id="files"></div>
+</body>
+</html>
